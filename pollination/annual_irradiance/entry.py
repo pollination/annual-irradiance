@@ -243,5 +243,5 @@ class AnnualIrradianceEntryPoint(DAG):
 
     cumulative_radiation = Outputs.folder(
         source='metrics/cumulative_radiation', description='The cumulative radiation '
-        'in Wh/m2 over the Wea time period.', alias=cumulative_radiation_results
+        'in kWh/m2 over the Wea time period.', alias=cumulative_radiation_results
     )
