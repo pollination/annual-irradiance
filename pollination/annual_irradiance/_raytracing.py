@@ -113,7 +113,7 @@ class AnnualIrradianceRayTracing(DAG):
     ):
         return [
             {
-                'from': DaylightContribution()._outputs.result_file,
+                'from': DaylightCoefficient()._outputs.result_file,
                 'to': '{{item.name}}.ill'
             }
         ]
@@ -136,7 +136,7 @@ class AnnualIrradianceRayTracing(DAG):
     ):
         return [
             {
-                'from': DaylightContribution()._outputs.result_file,
+                'from': DaylightCoefficient()._outputs.result_file,
                 'to': '{{item.name}}.ill'
             }
         ]
