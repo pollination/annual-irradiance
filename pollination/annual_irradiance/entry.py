@@ -8,7 +8,7 @@ from pollination.honeybee_radiance.post_process import AnnualIrradianceMetrics
 from pollination.path.copy import Copy
 
 # input/output alias
-from pollination.alias.inputs.model import hbjson_model_input
+from pollination.alias.inputs.model import hbjson_model_grid_input
 from pollination.alias.inputs.wea import wea_input
 from pollination.alias.inputs.north import north_input
 from pollination.alias.inputs.radiancepar import rad_par_annual_input
@@ -62,7 +62,7 @@ class AnnualIrradianceEntryPoint(DAG):
     model = Inputs.file(
         description='A Honeybee model in HBJSON file format.',
         extensions=['json', 'hbjson'],
-        alias=hbjson_model_input
+        alias=hbjson_model_grid_input
     )
 
     wea = Inputs.file(
@@ -188,7 +188,7 @@ class AnnualIrradianceEntryPoint(DAG):
         ],
         loop=create_rad_folder._outputs.sensor_grids,
         sub_folder='initial_results/{{item.name}}',  # create a subfolder for each grid
-        sub_paths={'sensor_grid': 'grid/{{item.full_id}}.pts'}  # sub_path for sensor_grid arg
+        sub_paths={'sensor_grid': 'grid/{{item.full_id}}.pts'}  # sensor_grid sub path
     )
     def annual_irradiance_raytracing(
         self,
@@ -218,6 +218,10 @@ class AnnualIrradianceEntryPoint(DAG):
             {
                 'from': AnnualIrradianceMetrics()._outputs.metrics,
                 'to': 'metrics'
+            },
+            {
+                'from': AnnualIrradianceMetrics()._outputs.timestep_file,
+                'to': 'results/total/timestep.txt'
             }
         ]
 
