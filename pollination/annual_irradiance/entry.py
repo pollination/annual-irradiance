@@ -1,6 +1,6 @@
 from pollination_dsl.dag import Inputs, DAG, task, Outputs
 from dataclasses import dataclass
-from pollination.honeybee_radiance.sun import CreateSunMatrix, ParseSunUpHours
+from pollination.honeybee_radiance.sun import CreateSunMtx, ParseSunUpHours
 from pollination.honeybee_radiance.translate import CreateRadianceFolderGrid
 from pollination.honeybee_radiance.octree import CreateOctree, CreateOctreeWithSky
 from pollination.honeybee_radiance.sky import CreateSkyDome, CreateSkyMatrix
@@ -15,6 +15,7 @@ from pollination.alias.inputs.north import north_input
 from pollination.alias.inputs.radiancepar import rad_par_annual_input
 from pollination.alias.inputs.grid import grid_filter_input, \
     min_sensor_count_input, cpu_count
+from pollination.alias.inputs.bool_options import visible_vs_solar_input
 from pollination.alias.outputs.daylight import total_radiation_results, \
     average_irradiance_results, peak_irradiance_results, cumulative_radiation_results
 
@@ -30,6 +31,17 @@ class AnnualIrradianceEntryPoint(DAG):
         description='Input wea timestep. This value will be used to compute '
         'cumulative radiation results.', default=1,
         spec={'type': 'integer', 'minimum': 1, 'maximum': 60}
+    )
+
+    output_type = Inputs.str(
+        description='Text for the type of irradiance output, which can be solar '
+        'or visible. Note that the output values will still be irradiance (W/m2) '
+        'when visible is selected but these irradiance values will be just for '
+        'the visible portion of the electromagnetic spectrum. The visible '
+        'irradiance values can be converted into illuminance by multiplying them '
+        'by the Radiance luminous efficacy factor of 179.', default='solar',
+        spec={'type': 'string', 'enum': ['visible', 'solar']},
+        alias=visible_vs_solar_input
     )
 
     north = Inputs.float(
@@ -85,14 +97,17 @@ class AnnualIrradianceEntryPoint(DAG):
         alias=wea_input
     )
 
-    @task(template=CreateSunMatrix)
-    def generate_sunpath(self, north=north, wea=wea, output_type=1):
+    @task(template=CreateSunMtx)
+    def generate_sunpath(self, north=north, wea=wea, output_type=output_type):
         """Create sunpath for sun-up-hours."""
         return [
-            {'from': CreateSunMatrix()._outputs.sunpath, 'to': 'resources/sunpath.mtx'},
             {
-                'from': CreateSunMatrix()._outputs.sun_modifiers,
-                'to': 'resources/suns.mod'
+                'from': CreateSunMtx()._outputs.sunpath,
+                'to': 'resources/sunpath.mtx'
+            },
+            {
+                'from': CreateSunMtx()._outputs.sun_modifiers,
+                'to': 'resources/sunpath.mod'
             }
         ]
 
@@ -194,7 +209,7 @@ class AnnualIrradianceEntryPoint(DAG):
 
     @task(template=CreateSkyMatrix)
     def create_total_sky(
-        self, north=north, wea=wea, sky_type='total', output_type='solar',
+        self, north=north, wea=wea, sky_type='total', output_type=output_type,
         sun_up_hours='sun-up-hours'
     ):
         return [
@@ -203,7 +218,7 @@ class AnnualIrradianceEntryPoint(DAG):
 
     @task(template=CreateSkyMatrix)
     def create_direct_sky(
-        self, north=north, wea=wea, sky_type='sun-only', output_type='solar',
+        self, north=north, wea=wea, sky_type='sun-only', output_type=output_type,
         sun_up_hours='sun-up-hours'
     ):
         return [
