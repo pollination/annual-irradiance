@@ -17,7 +17,8 @@ from pollination.alias.inputs.grid import grid_filter_input, \
     min_sensor_count_input, cpu_count
 from pollination.alias.inputs.bool_options import visible_vs_solar_input
 from pollination.alias.outputs.daylight import total_radiation_results, \
-    average_irradiance_results, peak_irradiance_results, cumulative_radiation_results
+    direct_radiation_results, average_irradiance_results, peak_irradiance_results, \
+    cumulative_radiation_results
 
 from ._raytracing import AnnualIrradianceRayTracing
 
@@ -86,8 +87,10 @@ class AnnualIrradianceEntryPoint(DAG):
     )
 
     model = Inputs.file(
-        description='A Honeybee model in HBJSON file format.',
-        extensions=['json', 'hbjson'],
+        description='A Honeybee Model JSON file (HBJSON) or a Model pkl (HBpkl) file. '
+        'This can also be a zipped version of a Radiance folder, in which case this '
+        'recipe will simply unzip the file and simulate it as-is.',
+        extensions=['json', 'hbjson', 'pkl', 'hbpkl', 'zip'],
         alias=hbjson_model_grid_input
     )
 
@@ -327,6 +330,12 @@ class AnnualIrradianceEntryPoint(DAG):
         source='results/total', description='Folder with raw result files (.ill) that '
         'contain matrices of irradiance in W/m2 for each time step of the Wea '
         'time period.', alias=total_radiation_results
+    )
+
+    results_direct = Outputs.folder(
+        source='results/direct', description='Folder with raw result files (.ill) that '
+        'contain matrices for just the direct irradiance.',
+        alias=direct_radiation_results
     )
 
     average_irradiance = Outputs.folder(
