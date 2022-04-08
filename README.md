@@ -5,7 +5,7 @@ Annual irradiance recipe.
 This recipe calculates solar irradiance at each time step provided by a wea file.
 The fundamental calculation of this recipe is the same as that of
 [Annual Daylight](https://github.com/pollination/annual-daylight) in that a detailed
-accounting of direct sun is computed at each timestep. However, the recipe computes
+accounting of direct sun is computed at each time step. However, the recipe computes
 broadband solar irradiance in W/m2 instead of visible illuminance in lux.
 
 The detailed matrices of W/m2 at each time step are stored under `results/total`.
