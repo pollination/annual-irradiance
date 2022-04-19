@@ -9,6 +9,7 @@ accounting of direct sun is computed at each time step. However, the recipe comp
 broadband solar irradiance in W/m2 instead of visible illuminance in lux.
 
 The detailed matrices of W/m2 at each time step are stored under `results/total`.
+Detailed matrices of just the direct component (W/m2) are output to `results/direct`.
 The following values are also recorded for each sensor point under the `metrics` folder:
 
 * `average_irradiance` - The average irradiance in W/m2 over the Wea time period
