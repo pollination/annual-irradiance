@@ -7,6 +7,7 @@ from pollination.honeybee_radiance.sky import CreateSkyDome, CreateSkyMatrix
 from pollination.honeybee_radiance.grid import SplitGridFolder, MergeFolderData
 from pollination.honeybee_radiance.post_process import AnnualIrradianceMetrics
 from pollination.path.copy import Copy
+from pollination.honeybee_vtk.translate import Translate as TranslateVTKJS
 
 # input/output alias
 from pollination.alias.inputs.model import hbjson_model_grid_input
@@ -334,6 +335,23 @@ class AnnualIrradianceEntryPoint(DAG):
                 'to': 'results/direct/timestep.txt'
             }
         ]
+
+    @task(template=TranslateVTKJS, needs=[calculate_metrics])
+    def create_vtkjs(
+        self, hbjson_file=model, file_type='vtkjs', grid_options='meshes',
+        data='metrics'
+    ):
+        return [
+            {
+                'from': TranslateVTKJS()._outputs.output_file,
+                'to': 'visualization/annual_irradiance.vtkjs'
+            }
+        ]
+
+    visualization = Outputs.file(
+        source='visualization/annual_irradiance.vtkjs',
+        description='Results visualization in 3D in vtkjs format.'
+    )
 
     results = Outputs.folder(
         source='results/total', description='Folder with raw result files (.ill) that '
