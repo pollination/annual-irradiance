@@ -326,6 +326,15 @@ class AnnualIrradianceEntryPoint(DAG):
             }
         ]
 
+    @task(template=Copy, needs=[calculate_metrics])
+    def copy_timestep_file(self, src=calculate_metrics._outputs.timestep_file):
+        return [
+            {
+                'from': Copy()._outputs.dst,
+                'to': 'results/direct/timestep.txt'
+            }
+        ]
+
     results = Outputs.folder(
         source='results/total', description='Folder with raw result files (.ill) that '
         'contain matrices of irradiance in W/m2 for each time step of the Wea '
