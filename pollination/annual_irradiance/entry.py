@@ -73,7 +73,7 @@ class AnnualIrradianceEntryPoint(DAG):
 
     radiance_parameters = Inputs.str(
         description='Radiance parameters for ray tracing.',
-        default='-ab 2 -ad 5000 -lw 2e-05',
+        default='-ab 2 -ad 5000 -lw 2e-05 -dr 0',
         alias=rad_par_annual_input
     )
 

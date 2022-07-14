@@ -1,4 +1,4 @@
-"""Raytracing DAG for annual irradiance."""
+"""Ray tracing DAG for annual irradiance."""
 
 from pollination_dsl.dag import Inputs, DAG, task
 from dataclasses import dataclass
@@ -67,7 +67,7 @@ class AnnualIrradianceRayTracing(DAG):
         self,
         name=grid_name,
         radiance_parameters=radiance_parameters,
-        fixed_radiance_parameters='-aa 0.0 -I -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0',
+        fixed_radiance_parameters='-aa 0.0 -I -ab 0 -dc 1.0 -dt 0.0 -dj 0.0',
         sensor_count=sensor_count,
         modifiers=sun_modifiers,
         sensor_grid=sensor_grid,
