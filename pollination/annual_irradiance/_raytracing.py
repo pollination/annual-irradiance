@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pollination.honeybee_radiance.contrib import DaylightContribution
 from pollination.honeybee_radiance.coefficient import DaylightCoefficient
 from pollination.honeybee_radiance.sky import AddRemoveSkyMatrix
-
+from pollination.path.copy import Copy
 
 @dataclass
 class AnnualIrradianceRayTracing(DAG):
@@ -65,7 +65,6 @@ class AnnualIrradianceRayTracing(DAG):
     @task(template=DaylightContribution)
     def direct_sun(
         self,
-        name=grid_name,
         radiance_parameters=radiance_parameters,
         fixed_radiance_parameters='-aa 0.0 -I -ab 0 -dc 1.0 -dt 0.0 -dj 0.0',
         sensor_count=sensor_count,
@@ -79,6 +78,15 @@ class AnnualIrradianceRayTracing(DAG):
         return [
             {
                 'from': DaylightContribution()._outputs.result_file,
+                'to': 'direct_sun.ill'
+            }
+        ]
+
+    @task(template=Copy, needs=[direct_sun])
+    def copy_direct_sun(self, name=grid_name, src=direct_sun._outputs.result_file):
+        return [
+            {
+                'from': Copy()._outputs.dst,
                 'to': '../final/direct/{{self.name}}.ill'
             }
         ]
