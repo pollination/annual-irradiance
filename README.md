@@ -11,9 +11,9 @@ The detailed matrices of W/m2 at each time step are stored under `results/total`
 Detailed matrices of just the direct component (W/m2) are output to `results/direct`.
 The following values are also recorded for each sensor point under the `metrics` folder:
 
-* `average_irradiance` - The average irradiance in W/m2 over the Wea time period
-* `peak_irradiance` - The highest irradiance value in W/m2 during the Wea time period
-* `cumulative_radiation` - The cumulative radiation in kWh/m2 over the Wea time period
+* `average_irradiance`: The average irradiance in W/m2 over the Wea time period
+* `peak_irradiance`: The highest irradiance value in W/m2 during the Wea time period
+* `cumulative_radiation`: The cumulative radiation in kWh/m2 over the Wea time period
 
 The `peak_irradiance` value is suitable for assessing the worst-case solar load
 on cooling design days or the highest radiant temperatures that occupants might
