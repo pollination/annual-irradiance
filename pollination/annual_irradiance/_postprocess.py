@@ -3,6 +3,7 @@ from pollination_dsl.dag import Inputs, GroupedDAG, task, Outputs
 from pollination.honeybee_radiance.grid import MergeFolderData
 from pollination.honeybee_radiance.post_process import AnnualIrradianceMetrics
 from pollination.path.copy import CopyFile, CopyFileMultiple
+from pollination.honeybee_vtk.translate import Translate as TranslateVTKJS
 
 # input/output alias
 from pollination.alias.inputs.wea import wea_input
@@ -13,6 +14,11 @@ class AnnualIrradiancePostprocess(GroupedDAG):
     """Post-process for annual irradiance."""
 
     # inputs
+    model = Inputs.file(
+        description='Input Honeybee model.',
+        extensions=['json', 'hbjson', 'pkl', 'hbpkl', 'zip']
+    )
+
     input_folder = Inputs.folder(
         description='Folder with DGP results before redistributing the '
         'results to the original grids.'
@@ -121,10 +127,27 @@ class AnnualIrradiancePostprocess(GroupedDAG):
             }
         ]
 
+    @task(template=TranslateVTKJS, needs=[calculate_metrics])
+    def create_vtkjs(
+        self, hbjson_file=model, file_type='vtkjs', grid_options='meshes',
+        data='metrics'
+    ):
+        return [
+            {
+                'from': TranslateVTKJS()._outputs.output_file,
+                'to': 'visualization/annual_irradiance.vtkjs'
+            }
+        ]
+
     results = Outputs.folder(
         source='results', description='results folder.'
     )
 
     metrics = Outputs.folder(
         source='metrics', description='metrics folder.'
+    )
+
+    visualization = Outputs.file(
+        source='visualization/annual_irradiance.vtkjs',
+        description='Results visualization in 3D in vtkjs format.'
     )

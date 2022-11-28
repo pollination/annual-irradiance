@@ -166,7 +166,7 @@ class AnnualIrradianceEntryPoint(DAG):
         self, input_folder=prepare_folder_annual_irradiance._outputs.initial_results,
         grids_info=prepare_folder_annual_irradiance._outputs.resources,
         sun_up_hours=prepare_folder_annual_irradiance._outputs.resources,
-        wea=wea,
+        wea=wea, model=model
     ):
         return [
             {
@@ -176,8 +176,17 @@ class AnnualIrradianceEntryPoint(DAG):
             {
                 'from': AnnualIrradiancePostprocess()._outputs.metrics,
                 'to': 'metrics'
+            },
+            {
+                'from': AnnualIrradiancePostprocess()._outputs.visualization,
+                'to': 'visualization/annual_irradiance.vtkjs'
             }
         ]
+
+    visualization = Outputs.file(
+        source='visualization/annual_irradiance.vtkjs',
+        description='Results visualization in 3D in vtkjs format.'
+    )
 
     results = Outputs.folder(
         source='results/total', description='Folder with raw result files (.ill) that '
