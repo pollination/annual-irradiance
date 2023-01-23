@@ -3,7 +3,7 @@ from pollination_dsl.dag import Inputs, GroupedDAG, task, Outputs
 from pollination.honeybee_radiance.grid import MergeFolderData
 from pollination.honeybee_radiance.post_process import AnnualIrradianceMetrics
 from pollination.path.copy import CopyFile, CopyFileMultiple
-from pollination.honeybee_vtk.translate import Translate as TranslateVTKJS
+from pollination.honeybee_display.translate import ModelToVis
 
 # input/output alias
 from pollination.alias.inputs.wea import wea_input
@@ -127,15 +127,14 @@ class AnnualIrradiancePostprocess(GroupedDAG):
             }
         ]
 
-    @task(template=TranslateVTKJS, needs=[calculate_metrics])
-    def create_vtkjs(
-        self, hbjson_file=model, file_type='vtkjs', grid_options='meshes',
-        data='metrics'
+    @task(template=ModelToVis, needs=[calculate_metrics])
+    def create_vsf(
+        self, model=model, grid_data='metrics', output_format='vsf'
     ):
         return [
             {
-                'from': TranslateVTKJS()._outputs.output_file,
-                'to': 'visualization/annual_irradiance.vtkjs'
+                'from': ModelToVis()._outputs.output_file,
+                'to': 'visualization.vsf'
             }
         ]
 
@@ -148,6 +147,6 @@ class AnnualIrradiancePostprocess(GroupedDAG):
     )
 
     visualization = Outputs.file(
-        source='visualization/annual_irradiance.vtkjs',
-        description='Results visualization in 3D in vtkjs format.'
+        source='visualization.vsf',
+        description='Annual Irradiance result visualization in VisualizationSet format.'
     )

@@ -179,13 +179,13 @@ class AnnualIrradianceEntryPoint(DAG):
             },
             {
                 'from': AnnualIrradiancePostprocess()._outputs.visualization,
-                'to': 'visualization/annual_irradiance.vtkjs'
+                'to': 'visualization.vsf'
             }
         ]
 
     visualization = Outputs.file(
-        source='visualization/annual_irradiance.vtkjs',
-        description='Results visualization in 3D in vtkjs format.'
+        source='visualization.vsf',
+        description='Result visualization in VisualizationSet format.'
     )
 
     results = Outputs.folder(
